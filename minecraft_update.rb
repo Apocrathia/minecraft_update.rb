@@ -27,10 +27,10 @@
 RELEASE = 'craftbukkit-dev'
 
 # Minecraft server path
-#PATH = '/home/minecraft/McMyAdmin/Minecraft'
+PATH = '/home/minecraft/McMyAdmin/Minecraft'
 
-# Testing Path
-PATH = '/Users/ianyoung/Desktop/Minecraft'
+# Testing Path 
+#PATH = '/Users/ianyoung/Desktop/Minecraft'
 
 # previous version folder
 $PREVIOUS = "previous_versions"
