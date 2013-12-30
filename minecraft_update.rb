@@ -15,6 +15,8 @@
 # => enable selection of release stream (Done)
 # => replace tar calls with zlib calls
 # => if server doesn't exist, install (Done)
+# => create update method with url argument
+# => add spigot url (Done)
 
 # User-configurable options
 
@@ -43,6 +45,14 @@ CB_DEV = 'http://dl.bukkit.org/downloads/craftbukkit/get/latest-dev/craftbukkit.
 
 # Latest Stable craftbukkit
 CB_STABLE = 'http://dl.bukkit.org/latest-rb/craftbukkit.jar'
+
+# Latest successful Spigot build
+SPIGOT_DEV = 'http://ci.md-5.net/job/Spigot/lastSuccessfulBuild/artifact/Spigot-Server/target/spigot.jar'
+
+# Last stable Spigot build
+SPIGOT_STABLE = 'http://ci.md-5.net/job/Spigot/lastStableBuild/artifact/Spigot-Server/target/spigot.jar'
+
+# Latest recommended Spigot build
 
 # Set up logging
 $LOGFILE = 'update.log'
