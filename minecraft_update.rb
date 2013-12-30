@@ -50,9 +50,12 @@ def logger(text)
   # Open the log file in append mode
   log = File.open $LOGFILE, "a"
 
+  # output to console
   puts text.to_s
   
-  log << text.to_s
+  # output to logfile
+  log << text.to_s 
+  log << "\n"
 end
 
 # update minecraft
@@ -160,6 +163,8 @@ end
 
 # cd to directory
 Dir.chdir PATH
+
+logger("---------------------------------------------")
 
 # timestamp for log
 logger(Time.now)
