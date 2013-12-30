@@ -23,10 +23,10 @@
 CB_RELEASE = 'dev'
 
 # Minecraft server path
-#PATH = '/home/minecraft/McMyAdmin/Minecraft'
+PATH = '/home/minecraft/McMyAdmin/Minecraft'
 
 # Testing Path
-PATH = '/Users/ianyoung/Desktop/Minecraft'
+#PATH = '/Users/ianyoung/Desktop/Minecraft'
 
 # PLEASE DON'T EDIT ANYTHING BELOW THIS LINE
 
