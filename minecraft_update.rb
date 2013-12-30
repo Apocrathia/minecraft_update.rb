@@ -19,6 +19,7 @@
 # => add spigot url (Done)
 # => customizable previous version folder (Done)
 # => search for running minecraft process
+# => maybe add download progress bar?
 
 # User-configurable options
 
@@ -75,7 +76,7 @@ end
 # consolidated update method
 # parameters: name, stream, url, filename - all used as strings
 def update(name, stream, url, filename)
-	logger("Staring #{name} Update")
+	logger("Starting #{name} Update")
 	logger("Using #{stream} release stream.")
 
 	# check if there is a new version of the release
