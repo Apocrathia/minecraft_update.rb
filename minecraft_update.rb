@@ -17,25 +17,22 @@
 # => if server doesn't exist, install (Done)
 # => create update method with url argument (Done)
 # => add spigot url (Done)
-# => customizable previous version folder
+# => customizable previous version folder (Done)
+# => search for running minecraft process
 
 # User-configurable options
-
-# CraftBukkit Release Channel
-# Please change this value to either 'stable' or 'dev' (anything else will fail)
-CB_RELEASE = 'dev'
 
 # bukkit release (craftbukkit-stable, craftbukkit-dev, spigot-stable, spigot-dev)
 RELEASE = 'craftbukkit-dev'
 
 # Minecraft server path
-PATH = '/home/minecraft/McMyAdmin/Minecraft'
+#PATH = '/home/minecraft/McMyAdmin/Minecraft'
 
 # Testing Path
-#PATH = '/Users/ianyoung/Desktop/Minecraft'
+PATH = '/Users/ianyoung/Desktop/Minecraft'
 
 # previous version folder
-PREVIOUS = "previous_versions"
+$PREVIOUS = "previous_versions"
 
 # PLEASE DON'T EDIT ANYTHING BELOW THIS LINE
 
@@ -114,10 +111,10 @@ def update(name, stream, url, filename)
 			archive = "#{filename}.#{$timestamp}.tar.gz"
 			logger("Archiving previous version of #{name} to #{archive}")
 		
-			# compress minecraft & craftbukkit
-			`tar czf #{archive} craftbukkit.jar`
+			# compress original
+			`tar czf #{archive} #{filename}`
 		
-			File.rename(archive, "previous_versions/#{archive}")
+			File.rename(archive, "#{$PREVIOUS}/#{archive}")
 	
 			# move the temp file into new location
 			File.rename(tempfile, filename)
@@ -135,7 +132,7 @@ end
 
 # make sure the PATH exists
 if !Dir.exists?(PATH)
-	logger("Mincraft path not found. Aborting.")
+	logger("Minecraft path not found. Aborting.")
 	abort
 end
 
@@ -154,9 +151,9 @@ logger("Starting update script.")
 $timestamp = Time.now.year.to_s + Time.now.month.to_s + Time.now.day.to_s
 
 # make sure the directory exists
-if !Dir.exists?('previous_versions')
-	logger("previous_versions folder does not exist. Creating.")
-	Dir.mkdir('previous_versions')
+if !Dir.exists?($PREVIOUS)
+	logger("previous version folder does not exist. Creating.")
+	Dir.mkdir($PREVIOUS)
 end
 
 # update minecraft
@@ -176,10 +173,6 @@ else
 	# this is why we can't have nice things
 	logger("Release configuration incorrect. Please adjust settings")
 end
-
-# legacy calls	
-#update_minecraft
-#update_craftbukkit
 
 # that should be it.
 
