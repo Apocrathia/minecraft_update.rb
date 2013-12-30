@@ -1,11 +1,11 @@
 #! /usr/bin/env ruby
 
 # Minecraft & CraftBukkit Update Script
-# 
+#
 # The following script will update both Minecraft server
 # to the latest release, and CraftBukkit to the latest
 # development snapshot (CraftBukkit tends to lag behind).
-# 
+#
 # It is assumed that the minecraft server has aleady been halted
 # DO NOT RUN THIS SCRIPT WITH THE MINECRAFT SERVER RUNNING
 #
@@ -29,7 +29,7 @@ RELEASE = 'craftbukkit-dev'
 # Minecraft server path
 PATH = '/home/minecraft/McMyAdmin/Minecraft'
 
-# Testing Path 
+# Testing Path
 #PATH = '/Users/ianyoung/Desktop/Minecraft'
 
 # previous version folder
@@ -68,7 +68,7 @@ def logger(text)
 
 	# output to console
 	puts text.to_s
-	
+
 	# output to logfile
 	log << text.to_s + "\n"
 end
@@ -84,12 +84,12 @@ def update(name, stream, url, filename)
 	tempfile = Tempfile.new('tempfile')
 	tempfile.write(open(url, "rb").read)
 	tempfile.rewind
-	
+
 	# check to make sure file is even installed
 	if !File.exists?(filename)
 		# move the temp file
 		File.rename(tempfile, filename)
-	
+
 		logger("#{name} #{stream} Installed")
 	else
 		# pull md5 of remote file
@@ -104,29 +104,28 @@ def update(name, stream, url, filename)
 		# if match no update needed
 		if current_hash == new_hash
 			logger("Already up-to-date")
-		
+
 		# if not a match, update (probably) needed
 		elsif current_hash != new_hash
 			logger("A new version is available")
-			
+
 			archive = "#{filename}.#{$timestamp}.tar.gz"
 			logger("Archiving previous version of #{name} to #{archive}")
-		
+
 			# compress original
 			`tar czf #{archive} #{filename}`
-		
+
 			File.rename(archive, "#{$PREVIOUS}/#{archive}")
-	
+
 			# move the temp file into new location
 			File.rename(tempfile, filename)
-		
+
 			logger("#{name} Updated")
 		else
 			# you fucked up.
 			logger("Something went wrong trying to update #{name}.")
 		end
 	end
-	
 	# Clean up the temp file
 	tempfile.close
 end
@@ -166,7 +165,7 @@ when "craftbukkit-stable"
 	update('CraftBukkit', 'Stable', CB_STABLE, 'craftbukkit.jar')
 when "craftbukkit-dev"
 	update('CraftBukkit', 'Development', CB_DEV, 'craftbukkit.jar')
-when "spigot-stable" 
+when "spigot-stable"
 	update('Spigot', 'Stable', SPIGOT_STABLE, 'spigot.jar')
 when "spigot-dev"
 	update('Spigot', 'Development', SPIGOT_DEV, 'spigot.jar')
@@ -175,5 +174,6 @@ else
 	logger("Release configuration incorrect. Please adjust settings")
 end
 
-# that should be it.
-
+# that should be it. Please let me know if you have any questions,
+# comments, issues, or requests on the github page for this script:
+# https://github.com/Apocrathia/minecraft_update.rb
