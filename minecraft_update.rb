@@ -15,8 +15,9 @@
 # => enable selection of release stream (Done)
 # => replace tar calls with zlib calls
 # => if server doesn't exist, install (Done)
-# => create update method with url argument
+# => create update method with url argument (Done)
 # => add spigot url (Done)
+# => customizable previous version folder
 
 # User-configurable options
 
@@ -24,11 +25,17 @@
 # Please change this value to either 'stable' or 'dev' (anything else will fail)
 CB_RELEASE = 'dev'
 
+# bukkit release (craftbukkit-stable, craftbukkit-dev, spigot-stable, spigot-dev)
+RELEASE = 'craftbukkit-dev'
+
 # Minecraft server path
 PATH = '/home/minecraft/McMyAdmin/Minecraft'
 
 # Testing Path
 #PATH = '/Users/ianyoung/Desktop/Minecraft'
+
+# previous version folder
+PREVIOUS = "previous_versions"
 
 # PLEASE DON'T EDIT ANYTHING BELOW THIS LINE
 
@@ -58,130 +65,78 @@ SPIGOT_STABLE = 'http://ci.md-5.net/job/Spigot/lastStableBuild/artifact/Spigot-S
 $LOGFILE = 'update.log'
 
 def logger(text)
-  # Open the log file in append mode
-  log = File.open $LOGFILE, "a"
+	# Open the log file in append mode
+	log = File.open $LOGFILE, "a"
 
-  # output to console
-  puts text.to_s
-  
-  # output to logfile
-  log << text.to_s 
-  log << "\n"
+	# output to console
+	puts text.to_s
+	
+	# output to logfile
+	log << text.to_s + "\n"
 end
 
-# update minecraft
-def update_minecraft
-  puts "Starting Minecraft Update"
-  
-  # check if there is a new version of the minecraft_server.jar
-  # file is downloaded to temp file for multiple uses without redownloading
-  mc_temp = Tempfile.new('mc_temp')
-  mc_temp.write(open(MC_SERVER, "rb").read)
-  mc_temp.rewind
-  if !File.exists?('minecraft_server.jar')
-    # move the temp file into minecraft_server.jar
-    File.rename(mc_temp, 'minecraft_server.jar')
-  
-    logger("Minecraft Installed")
-  else
-    # pull md5 of remote file
-    mc_new_hash = Digest::MD5.hexdigest(File.read(mc_temp))
-    logger("New Minecraft MD5: #{mc_new_hash}")
-    # pull md5 of local file
-    mc_current_hash = Digest::MD5.hexdigest(File.read('minecraft_server.jar'))
-    logger("Current Minecraft MD5: #{mc_current_hash}")
+# consolidated update method
+# parameters: name, stream, url, filename - all used as strings
+def update(name, stream, url, filename)
+	logger("Staring #{name} Update")
+	logger("Using #{stream} release stream.")
 
-    # compare hashes
-    # if match no update needed
-    if mc_current_hash == mc_new_hash
-      logger("Already up-to-date.")
-  
-    # if not a match, update needed
-    elsif mc_current_hash != mc_new_hash
-      logger("A newer version is available")
+	# check if there is a new version of the release
+	# file is downloaded to temp file for multiple uses without redownloading
+	tempfile = Tempfile.new('tempfile')
+	tempfile.write(open(url, "rb").read)
+	tempfile.rewind
+	
+	# check to make sure file is even installed
+	if !File.exists?(filename)
+		# move the temp file
+		File.rename(tempfile, filename)
+	
+		logger("#{name} #{stream} Installed")
+	else
+		# pull md5 of remote file
+		new_hash = Digest::MD5.hexdigest(File.read(tempfile))
+		logger("New #{name} MD5: #{new_hash}")
 
-      mc_archive = "minecraft_server.#{$timestamp}.tar.gz"
-      # compress minecraft & craftbukkit
-      `tar czf #{mc_archive} minecraft_server.jar`
-  
-      # move to previous_versions folder
-      File.rename(mc_archive, "previous_versions/#{mc_archive}")
-  
-      # move the temp file into minecraft_server.jar
-      File.rename(mc_temp, 'minecraft_server.jar')
-  
-      logger("Minecraft Updated")
-    else
-      # Something got fucked up
-      logger("Something went wrong trying to update CraftBukkit.")
-    end
-  end
-  
-  # Clean up the tempfile
-  mc_temp.close
+		# pull md5 of local file
+		current_hash = Digest::MD5.hexdigest(File.read(filename))
+		logger("Current #{name} MD5: #{current_hash}")
+
+		# compare hashes
+		# if match no update needed
+		if current_hash == new_hash
+			logger("Already up-to-date")
+		
+		# if not a match, update (probably) needed
+		elsif current_hash != new_hash
+			logger("A new version is available")
+			
+			archive = "#{filename}.#{$timestamp}.tar.gz"
+			logger("Archiving previous version of #{name} to #{archive}")
+		
+			# compress minecraft & craftbukkit
+			`tar czf #{archive} craftbukkit.jar`
+		
+			File.rename(archive, "previous_versions/#{archive}")
+	
+			# move the temp file into new location
+			File.rename(tempfile, filename)
+		
+			logger("#{name} Updated")
+		else
+			# you fucked up.
+			logger("Something went wrong trying to update #{name}.")
+		end
+	end
+	
+	# Clean up the temp file
+	tempfile.close
 end
 
-# update craftbukkit
-def update_craftbukkit
-  logger("Staring CraftBukkit Update")
-  
-  # Determine CraftBukkit release stream
-  if CB_RELEASE == 'dev'
-    logger("Using development release stream.")
-    cb_server = CB_DEV
-  elsif CB_RELEASE == 'stable'
-    logger("Using stable release stream")
-    cb_server = CB_STABLE
-  end
-
-  # check if there is a new version of the craftbukkit.jar
-  # file is downloaded to temp file for multiple uses without redownloading
-  cb_temp = Tempfile.new('cb_temp')
-  cb_temp.write(open(cb_server, "rb").read)
-  cb_temp.rewind
-  
-  if !File.exists?('craftbukkit.jar')
-   # move the temp file into craftbukkit.jar
-    File.rename(cb_temp, 'craftbukkit.jar')
-  
-    logger("CraftBukkit Installed")
-  else
-    # pull md5 of remote file
-    cb_new_hash = Digest::MD5.hexdigest(File.read(cb_temp))
-    logger("New CraftBukkit MD5: #{cb_new_hash}")
-
-    # pull md5 of local file
-    cb_current_hash = Digest::MD5.hexdigest(File.read('craftbukkit.jar'))
-    logger("Current CraftBukkit MD5: #{cb_current_hash}")
-
-    # compare hashes
-    # if match no update needed
-    if cb_current_hash == cb_new_hash
-      logger("Already up-to-date")
-    
-    # if not a match, update needed
-    elsif cb_current_hash != cb_new_hash
-      logger("A new version is available")
-    
-      cb_archive = "craftbukkit.#{$timestamp}.tar.gz"
-    
-      # compress minecraft & craftbukkit
-      `tar czf #{cb_archive} craftbukkit.jar`
-    
-      File.rename(cb_archive, "previous_versions/#{cb_archive}")
-  
-      # move the temp file into craftbukkit.jar
-      File.rename(cb_temp, 'craftbukkit.jar')
-    
-      logger("CraftBukkit Updated")
-    else
-      # you fucked up. check the CB_RELESE variable
-      logger("Something went wrong trying to update CraftBukkit.")
-    end
-  end
-  
-  # Clean up the temp file
-  cb_temp.close
+# make sure the PATH exists
+if !Dir.exists?(PATH)
+	logger("Mincraft path not found. Aborting.")
+	abort
 end
 
 # cd to directory
@@ -200,12 +155,31 @@ $timestamp = Time.now.year.to_s + Time.now.month.to_s + Time.now.day.to_s
 
 # make sure the directory exists
 if !Dir.exists?('previous_versions')
-  logger("previous_versions folder does not exist. Creating.")
-  Dir.mkdir('previous_versions')
+	logger("previous_versions folder does not exist. Creating.")
+	Dir.mkdir('previous_versions')
 end
 
-update_minecraft
-update_craftbukkit
+# update minecraft
+update('Minecraft', 'Stable', MC_SERVER, 'minecraft_server.jar')
+
+# call to the update method
+case RELEASE
+when "craftbukkit-stable"
+	update('CraftBukkit', 'Stable', CB_STABLE, 'craftbukkit.jar')
+when "craftbukkit-dev"
+	update('CraftBukkit', 'Development', CB_DEV, 'craftbukkit.jar')
+when "spigot-stable" 
+	update('Spigot', 'Stable', SPIGOT_STABLE, 'spigot.jar')
+when "spigot-dev"
+	update('Spigot', 'Development', SPIGOT_DEV, 'spigot.jar')
+else
+	# this is why we can't have nice things
+	logger("Release configuration incorrect. Please adjust settings")
+end
+
+# legacy calls	
+#update_minecraft
+#update_craftbukkit
 
 # that should be it.
 
