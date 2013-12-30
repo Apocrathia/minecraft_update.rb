@@ -1,10 +1,11 @@
 #! /usr/bin/env ruby
 
-# Minecraft & CraftBukkit Update Script
+# Minecraft & Bukkit Update Script
 #
 # The following script will update both Minecraft server
-# to the latest release, and CraftBukkit to the latest
-# development snapshot (CraftBukkit tends to lag behind).
+# to the latest release, and Bukkit to the latest
+# selected release. The Script supports development and stable
+# release streams of both CraftBukkit and Spigot.
 #
 # It is assumed that the minecraft server has aleady been halted
 # DO NOT RUN THIS SCRIPT WITH THE MINECRAFT SERVER RUNNING
@@ -24,7 +25,7 @@
 # User-configurable options
 
 # bukkit release (craftbukkit-stable, craftbukkit-dev, spigot-stable, spigot-dev)
-RELEASE = 'craftbukkit-dev'
+RELEASE = 'spigot-dev'
 
 # Minecraft server path
 PATH = '/home/minecraft/McMyAdmin/Minecraft'
