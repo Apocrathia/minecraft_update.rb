@@ -21,6 +21,7 @@
 # => customizable previous version folder (Done)
 # => search for running minecraft process
 # => maybe add download progress bar?
+# => fix timestamp format: yyyymmdd
 
 # User-configurable options
 
