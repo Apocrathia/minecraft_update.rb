@@ -21,7 +21,7 @@
 # => customizable previous version folder (Done)
 # => search for running minecraft process
 # => maybe add download progress bar?
-# => fix timestamp format: yyyymmdd
+# => fix timestamp format: yyyymmdd (Done)
 
 # User-configurable options
 
@@ -150,7 +150,7 @@ logger(Time.now)
 logger("Starting update script.")
 
 # format a timestamp for the files (global scope)
-$timestamp = Time.now.year.to_s + Time.now.month.to_s + Time.now.day.to_s
+$timestamp = Time.now.strftime("%Y%m%d")
 
 # make sure the directory exists
 if !Dir.exists?($PREVIOUS)
